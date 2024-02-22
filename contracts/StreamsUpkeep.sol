@@ -15,6 +15,19 @@ import {LinkTokenInterface} from "@chainlink/contracts/src/v0.8/shared/interface
  * DO NOT USE THIS CODE IN PRODUCTION.
  */
 
+/**
+ * @dev Defines the parameters required to register a new upkeep.
+ * @param name The name of the upkeep to be registered.
+ * @param encryptedEmail An encrypted email address associated with the upkeep (optional).
+ * @param upkeepContract The address of the contract that requires upkeep.
+ * @param gasLimit The maximum amount of gas to be used for the upkeep execution.
+ * @param adminAddress The address that will have administrative privileges over the upkeep.
+ * @param triggerType An identifier for the type of trigger that initiates the upkeep (`1` for event-based).
+ * @param checkData Data passed to the checkUpkeep function to simulate conditions for triggering upkeep.
+ * @param triggerConfig Configuration parameters specific to the trigger type.
+ * @param offchainConfig Off-chain configuration data, if applicable.
+ * @param amount The amount of LINK tokens to fund the upkeep registration.
+ */
 struct RegistrationParams {
     string name;
     bytes encryptedEmail;
@@ -28,11 +41,19 @@ struct RegistrationParams {
     uint96 amount;
 }
 
+/**
+ * @dev Interface for the Automation Registrar contract.
+ */
 interface AutomationRegistrarInterface {
+    /**
+     * @dev Registers a new upkeep contract with Chainlink Automation.
+     * @param requestParams The parameters required for the upkeep registration, encapsulated in `RegistrationParams`.
+     * @return upkeepID The unique identifier for the registered upkeep, used for future interactions.
+     */
     function registerUpkeep(RegistrationParams calldata requestParams) external returns (uint256);
 }
 
-// Custom interfaces for IVerifierProxy and IFeeManager
+// Custom interfaces for Data Streams: IVerifierProxy and IFeeManager
 interface IVerifierProxy {
     function verify(bytes calldata payload, bytes calldata parameterPayload)
         external
@@ -105,14 +126,18 @@ contract StreamsUpkeep is ILogAutomation, StreamsLookupCompatibleInterface {
         i_registrar = registrar;
     }
 
+    /**
+     * @notice Registers a new upkeep using the specified parameters and predicts its ID.
+     * @dev This function first approves the transfer of LINK tokens specified in `params.amount` to the Automation Registrar contract.
+     *      It then registers the upkeep and stores its ID if registration is successful.
+     *      Reverts if auto-approve is disabled or registration fails.
+     * @param params The registration parameters, including name, upkeep contract address, gas limit, admin address, trigger type, and funding amount.
+     */
     function registerAndPredictID(RegistrationParams memory params) public {
-        // LINK must be approved for transfer - this can be done every time or once
-        // with an infinite approval
         i_link.approve(address(i_registrar), params.amount);
         uint256 upkeepID = i_registrar.registerUpkeep(params);
         if (upkeepID != 0) {
-            // DEV - Use the upkeepID however you see fit
-            s_upkeepID = upkeepID;
+            s_upkeepID = upkeepID; // DEV - Use the upkeepID however you see fit
         } else {
             revert("auto-approve disabled");
         }
