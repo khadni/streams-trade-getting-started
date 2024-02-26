@@ -112,7 +112,7 @@ contract StreamsUpkeep is ILogAutomation, StreamsLookupCompatibleInterface {
     address public FEE_ADDRESS;
     string public constant DATASTREAMS_FEEDLABEL = "feedIDs";
     string public constant DATASTREAMS_QUERYLABEL = "timestamp";
-    int192 public last_retrieved_price;
+    int192 public s_last_retrieved_price;
     uint256 s_upkeepID;
     bytes public s_LogTriggerConfig;
 
@@ -193,6 +193,6 @@ contract StreamsUpkeep is ILogAutomation, StreamsLookupCompatibleInterface {
         emit PriceUpdate(verifiedReport.price);
 
         // Store the price from the report
-        last_retrieved_price = verifiedReport.price;
+        s_last_retrieved_price = verifiedReport.price;
     }
 }

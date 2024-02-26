@@ -3,19 +3,19 @@
  * This task requires the address of the deployed StreamsUpkeep contract as input.
  */
 task("getLastRetrievedPrice", "Gets the last retrieved price from StreamsUpkeep")
-  .addParam("streamsUpkeep", "The address of the deployed StreamsUpkeep contract") // Define a required parameter for the task: the address of the StreamsUpkeep contract.
-  .setAction(async (taskArgs, hre) => {
-    const { streamsUpkeep } = taskArgs; // Destructure the streamsUpkeep address from the task arguments.
+    .addParam("streamsUpkeep", "The address of the deployed StreamsUpkeep contract") // Define a required parameter for the task: the address of the StreamsUpkeep contract.
+    .setAction(async (taskArgs, hre) => {
+        const { streamsUpkeep } = taskArgs // Destructure the streamsUpkeep address from the task arguments.
 
-    // Retrieve an instance of the StreamsUpkeep contract using the provided address.
-    // This enables interaction with the contract's functions.
-    const StreamsUpkeepContract = await hre.ethers.getContractAt("StreamsUpkeep", streamsUpkeep);
+        // Retrieve an instance of the StreamsUpkeep contract using the provided address.
+        // This enables interaction with the contract's functions.
+        const StreamsUpkeepContract = await hre.ethers.getContractAt("StreamsUpkeep", streamsUpkeep)
 
-    // Call the automatically generated getter function for the last_retrieved_price public state variable.
-    const lastRetrievedPrice = await StreamsUpkeepContract.last_retrieved_price();
+        // Call the automatically generated getter function for the last_retrieved_price public state variable.
+        const s_lastRetrievedPrice = await StreamsUpkeepContract.s_last_retrieved_price()
 
-    // Output the last retrieved price to the console.
-    console.log(`Last Retrieved Price: ${lastRetrievedPrice}`);
-  });
+        // Output the last retrieved price to the console.
+        console.log(`Last Retrieved Price: ${s_lastRetrievedPrice}`)
+    })
 
-module.exports = {};
+module.exports = {}
